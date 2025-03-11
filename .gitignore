@@ -1,18 +1,58 @@
-# Build and Release Folders
-bin-debug/
-bin-release/
-[Oo]bj/
-[Bb]in/
+import { useState } from "react";
 
-# Other files and folders
-.settings/
+export default function PerfilInvestidor() {
+  const perguntas = [
+    "Você se sentiria desconfortável se seus investimentos sofressem uma queda de 20% em um mês?",
+    "Prefere segurança financeira em vez de uma possível alta rentabilidade?",
+    "Já investe ou já investiu em ativos de renda variável, como ações ou fundos imobiliários?",
+    "Seu objetivo principal é preservar seu capital sem correr muitos riscos?",
+    "Você pode deixar seu dinheiro investido por mais de 5 anos sem precisar resgatar?",
+    "Estaria disposto a correr mais riscos para buscar maiores retornos no longo prazo?",
+    "Você já estudou sobre diferentes tipos de investimentos e sente que entende bem os riscos envolvidos?",
+    "Se perdesse dinheiro em um investimento, continuaria investindo ou sairia do mercado imediatamente?"
+  ];
 
-# Executables
-*.swf
-*.air
-*.ipa
-*.apk
+  const [respostas, setRespostas] = useState(Array(perguntas.length).fill(null));
+  const [resultado, setResultado] = useState(null);
 
-# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
-# should NOT be excluded as they contain compiler settings and other important
-# information for Eclipse / Flash Builder.
+  const handleResposta = (index, valor) => {
+    const novasRespostas = [...respostas];
+    novasRespostas[index] = valor;
+    setRespostas(novasRespostas);
+  };
+
+  const calcularPerfil = () => {
+    const conservador = respostas.slice(0, 2).filter(r => r === "sim").length + respostas.slice(3, 4).filter(r => r === "sim").length;
+    const agressivo = respostas.slice(4).filter(r => r === "sim").length;
+    
+    if (conservador > agressivo) {
+      setResultado({ perfil: "Conservador", descricao: "Você prioriza segurança e estabilidade. Investimentos em renda fixa são ideais para você." });
+    } else if (agressivo > conservador) {
+      setResultado({ perfil: "Agressivo", descricao: "Você busca alta rentabilidade e aceita volatilidade. Seu portfólio pode incluir ações e criptomoedas." });
+    } else {
+      setResultado({ perfil: "Moderado", descricao: "Você tem um equilíbrio entre segurança e risco, combinando renda fixa com renda variável." });
+    }
+  };
+
+  return (
+    <div className="p-4 max-w-md mx-auto bg-white rounded-xl shadow-md space-y-4">
+      <h2 className="text-xl font-bold text-center">Teste de Perfil de Investidor</h2>
+      {perguntas.map((pergunta, index) => (
+        <div key={index} className="flex flex-col gap-2">
+          <p>{pergunta}</p>
+          <div className="flex gap-4">
+            <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={() => handleResposta(index, "sim")}>Sim</button>
+            <button className="bg-red-500 text-white px-4 py-2 rounded" onClick={() => handleResposta(index, "nao")}>Não</button>
+          </div>
+        </div>
+      ))}
+      <button className="bg-blue-600 text-white px-4 py-2 rounded w-full" onClick={calcularPerfil}>Ver Meu Perfil</button>
+      {resultado && (
+        <div className="mt-4 p-4 border rounded bg-gray-100">
+          <h3 className="text-lg font-semibold">{resultado.perfil}</h3>
+          <p>{resultado.descricao}</p>
+        </div>
+      )}
+    </div>
+  );
+}
